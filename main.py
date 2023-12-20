@@ -221,11 +221,11 @@ class Application(tk.Tk):
         self.min_time_entry.delete(0, tk.END)
         self.max_time_entry.delete(0, tk.END)
         self.num_obj_entry.delete(0, tk.END)
+        self.agent_entry.delete(0, tk.END)
+        self.proxies_entry.delete(0, tk.END)
         self.proxy_mode.set(0)  # 체크박스 초기화
         self.proxy_type.set(0)  # 체크박스 초기화
         self.headless_check.set(False)  # 체크박스 초기화
-        self.agent_entry.delete(0, tk.END)
-        self.proxies_entry.delete(0, tk.END)
         self.extensions_tree.delete(*self.extensions_tree.get_children())  # 트리뷰 초기화
         
         # 특정 디렉토리를 탐색하여 '*.crx' 파일들을 불러옵니다.
