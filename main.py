@@ -1,4 +1,4 @@
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox, BooleanVar
 from ttkwidgets import CheckboxTreeview
 import tkinter as tk
 import glob
@@ -54,6 +54,7 @@ class PlaceholderText(tk.Text):
 class Application(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.check_states = {}  # 각 항목의 체크 상태를 저장할 딕셔너리입니다.
 
         self.title("New GUI Window")
         self.geometry("650x400")
@@ -199,25 +200,43 @@ class Application(tk.Tk):
         script_files = glob.glob(os.path.join('scripts', '*.py'))
 
         for script in script_files:
-            self.script_tree.insert('', 'end', text=os.path.basename(script))
+            item_id = os.path.basename(script)
+            self.check_states[item_id] = BooleanVar()  # 아이템의 체크 상태를 딕셔너리에 저장
+            self.script_tree.insert('', 'end', text=item_id)
 
         self.script_tree.bind('<<TreeviewSelect>>', self.on_tree_select)
-        
+            
         extensions_files = glob.glob(os.path.join('extensions', '*.crx'))
 
         for extensions in extensions_files:
-            self.extensions_tree.insert('', 'end', text=os.path.basename(extensions))
+            item_id = os.path.basename(extensions)
+            self.check_states[item_id] = BooleanVar()  # 아이템의 체크 상태를 딕셔너리에 저장
+            self.extensions_tree.insert('', 'end', text=item_id)
 
         self.extensions_tree.bind('<<TreeviewSelect>>', self.on_tree_select)
 
-    def on_tree_select(self, event):
-        selected_item = self.script_tree.selection()[0]
 
-        for item in self.script_tree.get_children():
-            if item != selected_item:
-                self.script_tree.change_state(item, "unchecked")
+    def on_tree_select(self, event=None):
+        selected_items = self.script_tree.selection()
+        if not selected_items:  # 선택된 항목이 없을 때
+            return  # 아무런 동작도 하지 않고 함수를 종료합니다.
+        selected_item = selected_items[0]
 
-        self.script_tree.change_state(selected_item, "checked")
+    def add_item(self, item_id, text):
+        check_state = BooleanVar()  # 이 항목의 체크 상태를 추적할 BooleanVar입니다.
+        self.check_states[item_id] = check_state  # 딕셔너리에 저장합니다.
+
+        self.extensions_tree.insert('', 'end', iid=item_id, text=text,
+                                    values=(check_state.get(),),  # 체크 상태를 나타내는 컬럼입니다.
+                                    tags=(item_id,))  # 항목의 아이디를 태그로 추가합니다.
+        self.extensions_tree.tag_bind(item_id, '<1>', self.on_item_click)  # 항목을 클릭하면 on_item_click 함수를 호출합니다.
+
+    def on_item_click(self, event):
+        item_id = self.extensions_tree.identify_row(event.y)  # 클릭한 항목의 아이디를 가져옵니다.
+        check_state = self.check_states[item_id]  # 해당 항목의 체크 상태를 가져옵니다.
+        check_state.set(not check_state.get())  # 체크 상태를 반전합니다.
+        self.extensions_tree.item(item_id, values=('checked' if check_state.get() else 'unchecked',))  # 트리뷰에 체크 상태를 업데이트합니다.
+
 
     def new_project(self):
         # 새 프로젝트를 생성하면서 모든 위젯의 값을 초기화합니다.
@@ -231,8 +250,8 @@ class Application(tk.Tk):
         self.num_obj_entry.delete(0, tk.END)
         self.agent_text.delete('1.0', tk.END)
         self.proxies_text.delete('1.0', tk.END)
-        self.proxy_mode.set(0)  # 체크박스 초기화
-        self.proxy_type.set(0)  # 체크박스 초기화
+        self.proxy_mode.set(0)
+        self.proxy_type.set(0)
         self.headless_var.set(0)  # 체크박스 초기화
         self.extensions_tree.delete(*self.extensions_tree.get_children())  # 트리뷰 초기화
         
@@ -258,19 +277,19 @@ class Application(tk.Tk):
     def save_project(self):
         # 프로젝트를 저장하는 코드를 작성합니다.
         data = {
-            'keywords': self.keywords_text.get(),
-            'titles': self.titles_text.get(),
-            'links': self.links_text.get(),
-            'refer_urls': self.refer_urls_text.get(),
+            'keywords': self.keywords_text.get(1.0, 'end-1c'),
+            'titles': self.titles_text.get(1.0, 'end-1c'),
+            'links': self.links_text.get(1.0, 'end-1c'),
+            'refer_urls': self.refer_urls_text.get(1.0, 'end-1c'),
             'thread': self.thread_entry.get(),
             'min_time': self.min_time_entry.get(),
             'max_time': self.max_time_entry.get(),
             'num_obj': self.num_obj_entry.get(),
             'proxy_mode': self.proxy_mode.get(),
             'proxy_type': self.proxy_type.get(),
-            'headless_check': self.headless_check.instate(['selected']),
-            'agent': self.agent_text.get(),
-            'proxies': self.proxies_text.get(),
+            'headless_check': self.headless_var.get(),
+            'agent': self.agent_text.get(1.0, 'end-1c'),
+            'proxies': self.proxies_text.get(1.0, 'end-1c'),
             'extensions_tree': [self.extensions_tree.set(child) for child in self.extensions_tree.get_children() if self.check_states[child] == 'checked']
         }
         filepath = filedialog.asksaveasfilename(defaultextension="json", filetypes=[("Json files", "*.json")])
@@ -278,6 +297,7 @@ class Application(tk.Tk):
             return
         with open(filepath, 'w') as file:
             json.dump(data, file)
+
 
 
     def save_as_project(self):
