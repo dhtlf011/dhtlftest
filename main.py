@@ -1,8 +1,9 @@
-import tkinter as tk
-from tkinter import ttk
-import glob
-import os
+from tkinter import ttk, filedialog, messagebox
 from ttkwidgets import CheckboxTreeview
+import tkinter as tk
+import glob
+import json
+import os
 
 class PlaceholderEntry(ttk.Entry):
     def __init__(self, container, placeholder, *args, **kwargs):
@@ -60,22 +61,22 @@ class Application(tk.Tk):
         self.create_widgets()
 
     def create_widgets(self):
-        self.new_button = tk.Button(text="New")
+        self.new_button = tk.Button(text="New", command=self.new_project)
         self.new_button.place(x=0, y=5, width=60, height=25) 
 
-        self.open_button = tk.Button(text="Open")
+        self.open_button = tk.Button(text="Open", command=self.open_project)
         self.open_button.place(x=70, y=5, width=60, height=25) 
 
-        self.save_button = tk.Button(text="Save")
+        self.save_button = tk.Button(text="Save", command=self.save_project)
         self.save_button.place(x=140, y=5, width=60, height=25) 
 
-        self.saveas_button = tk.Button(text="Save as")
+        self.saveas_button = tk.Button(text="Save as", command=self.save_as_project)
         self.saveas_button.place(x=210, y=5, width=60, height=25) 
 
-        self.start_button = tk.Button(text="Start", command=self.run_script)
+        self.start_button = tk.Button(text="Start", command=self.start_project)
         self.start_button.place(x=280, y=5, width=60, height=25) 
 
-        self.stop_button = tk.Button(text="Stop")
+        self.stop_button = tk.Button(text="Stop", command=self.stop_project)
         self.stop_button.place(x=350, y=5, width=60, height=25)                                 
 
         self.notebook = ttk.Notebook(self)
@@ -210,15 +211,70 @@ class Application(tk.Tk):
 
         self.script_tree.change_state(selected_item, "checked")
 
+    def new_project(self):
+        # 새 프로젝트를 생성하면서 모든 위젯의 값을 초기화합니다.
+        self.keywords_entry.delete(0, tk.END)
+        self.titles_entry.delete(0, tk.END)
+        self.links_entry.delete(0, tk.END)
+        self.refer_urls_entry.delete(0, tk.END)
+        self.thread_entry.delete(0, tk.END)
+        self.min_time_entry.delete(0, tk.END)
+        self.max_time_entry.delete(0, tk.END)
+        self.num_obj_entry.delete(0, tk.END)
+        self.proxy_mode.set(0)  # 체크박스 초기화
+        self.proxy_type.set(0)  # 체크박스 초기화
+        self.headless_check.set(False)  # 체크박스 초기화
+        self.agent_entry.delete(0, tk.END)
+        self.proxies_entry.delete(0, tk.END)
+        self.extensions_tree.delete(*self.extensions_tree.get_children())  # 트리뷰 초기화
+        
+        # 특정 디렉토리를 탐색하여 '*.crx' 파일들을 불러옵니다.
+        directory = '/path/to/your/directory'  # 실제 디렉토리 경로로 변경해주세요.
+        for filename in os.listdir(directory):
+            if filename.endswith('.crx'):
+                # 파일을 트리뷰에 추가하는 코드...
+                # self.extensions_tree.insert('', 'end', text=filename)
+                pass
 
-    def run_script(self):
-        selected_script_items = self.script_tree.selection()
-        for item in selected_script_items:
-            script = self.script_tree.item(item)['text']
-            with open(script) as file:
-                code = compile(file.read(), script, 'exec')
-                exec(code)
-                self.log_list.insert(tk.END, f"Executed {script}")
+
+
+    def open_project(self):
+        # 프로젝트를 불러오는 코드를 작성합니다.
+        filepath = filedialog.askopenfilename(filetypes=[("Json files", "*.json")])
+        if not filepath:
+            return
+        with open(filepath, 'r') as file:
+            data = json.load(file)
+            # 데이터를 각 위젯에 적용
+            self.keywords_entry.insert(0, data['keywords'])
+            self.titles_entry.insert(0, data['titles'])
+            # 나머지 위젯들도 같은 방식으로 적용
+    
+    def save_project(self):
+        # 프로젝트를 저장하는 코드를 작성합니다.
+        data = {
+            'keywords': self.keywords_entry.get(),
+            'titles': self.titles_entry.get(),
+            # 나머지 위젯들의 값을 가져와서 저장합니다.
+        }
+        filepath = filedialog.asksaveasfilename(defaultextension="json", filetypes=[("Json files", "*.json")])
+        if not filepath:
+            return
+        with open(filepath, 'w') as file:
+            json.dump(data, file)
+
+    def save_as_project(self):
+        # 프로젝트를 다른 이름으로 저장하는 코드를 작성합니다.
+        # save_project와 동일하게 작동합니다.
+        self.save_project()
+
+    def start_project(self):
+        # 프로젝트를 실행하는 코드를 작성합니다.
+        pass
+
+    def stop_project(self):
+        # 프로젝트를 중지하는 코드를 작성합니다.
+        pass
 
 if __name__ == "__main__":
     app = Application()
