@@ -70,14 +70,11 @@ class Application(tk.Tk):
         self.save_button = tk.Button(text="Save", command=self.save_project)
         self.save_button.place(x=140, y=5, width=60, height=25) 
 
-        self.saveas_button = tk.Button(text="Save as", command=self.save_as_project)
-        self.saveas_button.place(x=210, y=5, width=60, height=25) 
-
         self.start_button = tk.Button(text="Start", command=self.start_project)
-        self.start_button.place(x=280, y=5, width=60, height=25) 
+        self.start_button.place(x=210, y=5, width=60, height=25) 
 
         self.stop_button = tk.Button(text="Stop", command=self.stop_project)
-        self.stop_button.place(x=350, y=5, width=60, height=25)                                 
+        self.stop_button.place(x=280, y=5, width=60, height=25)                                 
 
         self.notebook = ttk.Notebook(self)
         self.tab_scripts = ttk.Frame(self.notebook)
@@ -296,12 +293,6 @@ class Application(tk.Tk):
 
         with open(filename, 'w') as f:
             json.dump(data, f)
-
-
-    def save_as_project(self):
-        # 프로젝트를 다른 이름으로 저장하는 코드를 작성합니다.
-        # save_project와 동일하게 작동합니다.
-        self.save_project()
 
     def start_project(self):
         # 프로젝트를 실행하는 코드를 작성합니다.
