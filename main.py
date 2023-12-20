@@ -89,8 +89,6 @@ class Application(tk.Tk):
         self.script_tree.heading("#0", text="Script Name")
         self.script_tree.place(x=0, y=0, width=200, height=250) 
 
-        self.load_scripts()
-
         self.input_notebook = ttk.Notebook(self.tab_scripts)
         self.input_notebook.place(x=200, y=0, width=450, height=250) 
 
@@ -142,7 +140,8 @@ class Application(tk.Tk):
         self.proxy_type.place(x=0, y=160, width=200) 
 
         # 체크박스를 생성합니다.
-        self.headless_check = ttk.Checkbutton(self.tab_options, text="HeadLess Mode")
+        self.headless_var = tk.IntVar()
+        self.headless_check = tk.Checkbutton(self.tab_options, text="HeadLess Mode", variable=self.headless_var)
         self.headless_check.place(x=0, y=190, width=200) 
 
         # User Agents 탭을 생성합니다.
@@ -168,9 +167,11 @@ class Application(tk.Tk):
         self.extensions_tree.heading("#0", text="Extensions Name")
         self.extensions_tree.place(x=0, y=0, width=646, height=247) 
 
+        self.load_scripts()
+
         # Results 탭을 생성합니다.
         self.tab_result = ttk.Frame(self.notebook) # 'self.notebook'을 사용합니다.
-        self.notebook.add(self.tab_result, text='Browser Extensions')
+        self.notebook.add(self.tab_result, text='Results')
 
         self.result_tree = CheckboxTreeview(self.tab_result)
         self.result_tree['columns'] = ("#1", "#2", "#3", "#4", "#5")
@@ -201,6 +202,13 @@ class Application(tk.Tk):
             self.script_tree.insert('', 'end', text=os.path.basename(script))
 
         self.script_tree.bind('<<TreeviewSelect>>', self.on_tree_select)
+        
+        extensions_files = glob.glob(os.path.join('extensions', '*.crx'))
+
+        for extensions in extensions_files:
+            self.extensions_tree.insert('', 'end', text=os.path.basename(extensions))
+
+        self.extensions_tree.bind('<<TreeviewSelect>>', self.on_tree_select)
 
     def on_tree_select(self, event):
         selected_item = self.script_tree.selection()[0]
@@ -213,29 +221,26 @@ class Application(tk.Tk):
 
     def new_project(self):
         # 새 프로젝트를 생성하면서 모든 위젯의 값을 초기화합니다.
-        self.keywords_entry.delete(0, tk.END)
-        self.titles_entry.delete(0, tk.END)
-        self.links_entry.delete(0, tk.END)
-        self.refer_urls_entry.delete(0, tk.END)
+        self.keywords_entry.delete('1.0', tk.END)
+        self.titles_entry.delete('1.0', tk.END)
+        self.links_entry.delete('1.0', tk.END)
+        self.refer_urls_entry.delete('1.0', tk.END)
         self.thread_entry.delete(0, tk.END)
         self.min_time_entry.delete(0, tk.END)
         self.max_time_entry.delete(0, tk.END)
         self.num_obj_entry.delete(0, tk.END)
-        self.agent_entry.delete(0, tk.END)
-        self.proxies_entry.delete(0, tk.END)
+        self.agent_entry.delete('1.0', tk.END)
+        self.proxies_entry.delete('1.0', tk.END)
         self.proxy_mode.set(0)  # 체크박스 초기화
         self.proxy_type.set(0)  # 체크박스 초기화
-        self.headless_check.set(False)  # 체크박스 초기화
+        self.headless_var.set(0)  # 체크박스 초기화
         self.extensions_tree.delete(*self.extensions_tree.get_children())  # 트리뷰 초기화
         
         # 특정 디렉토리를 탐색하여 '*.crx' 파일들을 불러옵니다.
-        directory = '/path/to/your/directory'  # 실제 디렉토리 경로로 변경해주세요.
+        directory = 'extensions'  # 실제 디렉토리 경로로 변경해주세요.
         for filename in os.listdir(directory):
             if filename.endswith('.crx'):
-                # 파일을 트리뷰에 추가하는 코드...
-                # self.extensions_tree.insert('', 'end', text=filename)
-                pass
-
+                self.extensions_tree.insert('', 'end', text=filename)
 
 
     def open_project(self):
