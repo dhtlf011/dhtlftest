@@ -63,20 +63,20 @@ class Application(tk.Tk):
         self.new_button = tk.Button(text="New")
         self.new_button.place(x=0, y=5, width=60, height=25) 
 
-        self.start_button = tk.Button(text="Open")
-        self.start_button.place(x=70, y=5, width=60, height=25) 
+        self.open_button = tk.Button(text="Open")
+        self.open_button.place(x=70, y=5, width=60, height=25) 
 
-        self.start_button = tk.Button(text="Save")
-        self.start_button.place(x=140, y=5, width=60, height=25) 
+        self.save_button = tk.Button(text="Save")
+        self.save_button.place(x=140, y=5, width=60, height=25) 
 
-        self.start_button = tk.Button(text="Save as")
-        self.start_button.place(x=210, y=5, width=60, height=25) 
+        self.saveas_button = tk.Button(text="Save as")
+        self.saveas_button.place(x=210, y=5, width=60, height=25) 
 
         self.start_button = tk.Button(text="Start", command=self.run_script)
         self.start_button.place(x=280, y=5, width=60, height=25) 
 
-        self.start_button = tk.Button(text="Stop")
-        self.start_button.place(x=350, y=5, width=60, height=25)                                 
+        self.stop_button = tk.Button(text="Stop")
+        self.stop_button.place(x=350, y=5, width=60, height=25)                                 
 
         self.notebook = ttk.Notebook(self)
         self.tab_scripts = ttk.Frame(self.notebook)
@@ -121,77 +121,77 @@ class Application(tk.Tk):
         self.notebook.add(self.tab_options, text='Options')
 
         # 각각의 입력 필드와 레이블을 생성합니다.
-        thread_entry = PlaceholderEntry(self.tab_options, placeholder="쓰레드 수 입력.")
-        thread_entry.place(x=0, y=10, width=200, height=20) 
+        self.thread_entry = PlaceholderEntry(self.tab_options, placeholder="쓰레드 수 입력.")
+        self.thread_entry.place(x=0, y=10, width=200, height=20) 
 
-        min_time_entry = PlaceholderEntry(self.tab_options, placeholder="객체의 최소 시간 입력.")
-        min_time_entry.place(x=0, y=40, width=200, height=20) 
+        self.min_time_entry = PlaceholderEntry(self.tab_options, placeholder="객체의 최소 시간 입력.")
+        self.min_time_entry.place(x=0, y=40, width=200, height=20) 
 
-        max_time_entry = PlaceholderEntry(self.tab_options, placeholder="객체의 최대 시간 입력.")
-        max_time_entry.place(x=0, y=70, width=200, height=20) 
+        self.max_time_entry = PlaceholderEntry(self.tab_options, placeholder="객체의 최대 시간 입력.")
+        self.max_time_entry.place(x=0, y=70, width=200, height=20) 
 
-        num_obj_entry = PlaceholderEntry(self.tab_options, placeholder="쓰레드 총 반복 수")
-        num_obj_entry.place(x=0, y=100, width=200, height=20) 
+        self.num_obj_entry = PlaceholderEntry(self.tab_options, placeholder="쓰레드 총 반복 수")
+        self.num_obj_entry.place(x=0, y=100, width=200, height=20) 
 
         # 드롭다운 리스트를 생성합니다.
-        proxy_mode = ttk.Combobox(self.tab_options, values=["Private Proxies", "No Proxy"])
-        proxy_mode.place(x=0, y=130, width=200) 
+        self.proxy_mode = ttk.Combobox(self.tab_options, values=["Private Proxies", "No Proxy"])
+        self.proxy_mode.place(x=0, y=130, width=200) 
 
-        proxy_type = ttk.Combobox(self.tab_options, values=["HTTP", "SOCK4", "SOCK5"])
-        proxy_type.place(x=0, y=160, width=200) 
+        self.proxy_type = ttk.Combobox(self.tab_options, values=["HTTP", "SOCK4", "SOCK5"])
+        self.proxy_type.place(x=0, y=160, width=200) 
 
         # 체크박스를 생성합니다.
-        headless_check = ttk.Checkbutton(self.tab_options, text="HeadLess Mode")
-        headless_check.place(x=0, y=190, width=200) 
+        self.headless_check = ttk.Checkbutton(self.tab_options, text="HeadLess Mode")
+        self.headless_check.place(x=0, y=190, width=200) 
 
         # User Agents 탭을 생성합니다.
         self.tab_user_agents = ttk.Frame(self.notebook) # 'self.notebook'을 사용합니다.
         self.notebook.add(self.tab_user_agents, text='User Agents')
 
-        agent_entry = PlaceholderText(self.tab_user_agents, placeholder="유저 에이전트를 한줄에 한개씩 입력하세요.")
-        agent_entry.place(x=0, y=0, width=646, height=247) 
+        self.agent_entry = PlaceholderText(self.tab_user_agents, placeholder="유저 에이전트를 한줄에 한개씩 입력하세요.")
+        self.agent_entry.place(x=0, y=0, width=646, height=247) 
 
         # Private Proxies 탭을 생성합니다.
         self.tab_private_proxies = ttk.Frame(self.notebook) # 'self.notebook'을 사용합니다.
         self.notebook.add(self.tab_private_proxies, text='Private Proxies')
 
-        proxies_entry = PlaceholderText(self.tab_private_proxies, placeholder="프록시를 한줄에 한개씩 입력하세요.")
-        proxies_entry.place(x=0, y=0, width=646, height=247) 
+        self.proxies_entry = PlaceholderText(self.tab_private_proxies, placeholder="프록시를 한줄에 한개씩 입력하세요.")
+        self.proxies_entry.place(x=0, y=0, width=646, height=247) 
         
         # Browser Extensions 탭을 생성합니다.
         self.tab_extensions = ttk.Frame(self.notebook) # 'self.notebook'을 사용합니다.
         self.notebook.add(self.tab_extensions, text='Browser Extensions')
 
-        extensions_tree = CheckboxTreeview(self.tab_extensions)
-        extensions_tree.column("#0", width=646, minwidth=150, stretch=False)
-        extensions_tree.heading("#0", text="Extensions Name")
-        extensions_tree.place(x=0, y=0, width=646, height=247) 
+        self.extensions_tree = CheckboxTreeview(self.tab_extensions)
+        self.extensions_tree.column("#0", width=646, minwidth=150, stretch=False)
+        self.extensions_tree.heading("#0", text="Extensions Name")
+        self.extensions_tree.place(x=0, y=0, width=646, height=247) 
 
         # Results 탭을 생성합니다.
         self.tab_result = ttk.Frame(self.notebook) # 'self.notebook'을 사용합니다.
         self.notebook.add(self.tab_result, text='Browser Extensions')
 
-        result_tree = CheckboxTreeview(self.tab_result)
-        result_tree['columns'] = ("#1", "#2", "#3", "#4", "#5")
-        result_tree.column("#0", width=107, minwidth=107, stretch=False)
-        result_tree.heading("#0", text="Started")
+        self.result_tree = CheckboxTreeview(self.tab_result)
+        self.result_tree['columns'] = ("#1", "#2", "#3", "#4", "#5")
+        self.result_tree.column("#0", width=107, minwidth=107, stretch=False)
+        self.result_tree.heading("#0", text="Started")
 
-        result_tree.column("#1", width=107, minwidth=107, stretch=False)
-        result_tree.heading("#1", text="Script")
+        self.result_tree.column("#1", width=107, minwidth=107, stretch=False)
+        self.result_tree.heading("#1", text="Script")
 
-        result_tree.column("#2", width=107, minwidth=107, stretch=False)
-        result_tree.heading("#2", text="Proxy")
+        self.result_tree.column("#2", width=107, minwidth=107, stretch=False)
+        self.result_tree.heading("#2", text="Proxy")
 
-        result_tree.column("#3", width=107, minwidth=107, stretch=False)
-        result_tree.heading("#3", text="User Agent")
+        self.result_tree.column("#3", width=107, minwidth=107, stretch=False)
+        self.result_tree.heading("#3", text="User Agent")
 
-        result_tree.column("#4", width=107, minwidth=107, stretch=False)
-        result_tree.heading("#4", text="Browsing Time")
+        self.result_tree.column("#4", width=107, minwidth=107, stretch=False)
+        self.result_tree.heading("#4", text="Browsing Time")
 
-        result_tree.column("#5", width=107, minwidth=107, stretch=False)
-        result_tree.heading("#5", text="Output")
+        self.result_tree.column("#5", width=107, minwidth=107, stretch=False)
+        self.result_tree.heading("#5", text="Output")
 
-        result_tree.place(x=0, y=0, width=646, height=247) 
+        self.result_tree.place(x=0, y=0, width=646, height=247) 
 
     def load_scripts(self):
         script_files = glob.glob(os.path.join('scripts', '*.py'))
