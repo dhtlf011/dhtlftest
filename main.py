@@ -94,23 +94,23 @@ class Application(tk.Tk):
 
         self.tab_keywords = ttk.Frame(self.input_notebook)
         self.input_notebook.add(self.tab_keywords, text='Keywords')
-        self.keywords_entry = tk.Text(self.tab_keywords, height=1)
-        self.keywords_entry.place(x=0, y=0, width=450, height=225) 
+        self.keywords_text = tk.Text(self.tab_keywords, height=1)
+        self.keywords_text.place(x=0, y=0, width=450, height=225) 
 
         self.tab_titles = ttk.Frame(self.input_notebook)
         self.input_notebook.add(self.tab_titles, text='Titles')
-        self.titles_entry = tk.Text(self.tab_titles, height=1)
-        self.titles_entry.place(x=0, y=0, width=450, height=225) 
+        self.titles_text = tk.Text(self.tab_titles, height=1)
+        self.titles_text.place(x=0, y=0, width=450, height=225) 
 
         self.tab_links = ttk.Frame(self.input_notebook)
         self.input_notebook.add(self.tab_links, text='Links')
-        self.links_entry = tk.Text(self.tab_links, height=1)
-        self.links_entry.place(x=0, y=0, width=450, height=225) 
+        self.links_text = tk.Text(self.tab_links, height=1)
+        self.links_text.place(x=0, y=0, width=450, height=225) 
 
         self.tab_refer_urls = ttk.Frame(self.input_notebook)
         self.input_notebook.add(self.tab_refer_urls, text='Refer URLs')
-        self.refer_urls_entry = tk.Text(self.tab_refer_urls, height=1)
-        self.refer_urls_entry.place(x=0, y=0, width=450, height=225) 
+        self.refer_urls_text = tk.Text(self.tab_refer_urls, height=1)
+        self.refer_urls_text.place(x=0, y=0, width=450, height=225) 
 
         self.log_list = tk.Listbox(self)
         self.log_list.place(x=0, y=300, width=650, height=100) 
@@ -148,15 +148,15 @@ class Application(tk.Tk):
         self.tab_user_agents = ttk.Frame(self.notebook) # 'self.notebook'을 사용합니다.
         self.notebook.add(self.tab_user_agents, text='User Agents')
 
-        self.agent_entry = PlaceholderText(self.tab_user_agents, placeholder="유저 에이전트를 한줄에 한개씩 입력하세요.")
-        self.agent_entry.place(x=0, y=0, width=646, height=247) 
+        self.agent_text = PlaceholderText(self.tab_user_agents, placeholder="유저 에이전트를 한줄에 한개씩 입력하세요.")
+        self.agent_text.place(x=0, y=0, width=646, height=247) 
 
         # Private Proxies 탭을 생성합니다.
         self.tab_private_proxies = ttk.Frame(self.notebook) # 'self.notebook'을 사용합니다.
         self.notebook.add(self.tab_private_proxies, text='Private Proxies')
 
-        self.proxies_entry = PlaceholderText(self.tab_private_proxies, placeholder="프록시를 한줄에 한개씩 입력하세요.")
-        self.proxies_entry.place(x=0, y=0, width=646, height=247) 
+        self.proxies_text = PlaceholderText(self.tab_private_proxies, placeholder="프록시를 한줄에 한개씩 입력하세요.")
+        self.proxies_text.place(x=0, y=0, width=646, height=247) 
         
         # Browser Extensions 탭을 생성합니다.
         self.tab_extensions = ttk.Frame(self.notebook) # 'self.notebook'을 사용합니다.
@@ -221,16 +221,16 @@ class Application(tk.Tk):
 
     def new_project(self):
         # 새 프로젝트를 생성하면서 모든 위젯의 값을 초기화합니다.
-        self.keywords_entry.delete('1.0', tk.END)
-        self.titles_entry.delete('1.0', tk.END)
-        self.links_entry.delete('1.0', tk.END)
-        self.refer_urls_entry.delete('1.0', tk.END)
+        self.keywords_text.delete('1.0', tk.END)
+        self.titles_text.delete('1.0', tk.END)
+        self.links_text.delete('1.0', tk.END)
+        self.refer_urls_text.delete('1.0', tk.END)
         self.thread_entry.delete(0, tk.END)
         self.min_time_entry.delete(0, tk.END)
         self.max_time_entry.delete(0, tk.END)
         self.num_obj_entry.delete(0, tk.END)
-        self.agent_entry.delete('1.0', tk.END)
-        self.proxies_entry.delete('1.0', tk.END)
+        self.agent_text.delete('1.0', tk.END)
+        self.proxies_text.delete('1.0', tk.END)
         self.proxy_mode.set(0)  # 체크박스 초기화
         self.proxy_type.set(0)  # 체크박스 초기화
         self.headless_var.set(0)  # 체크박스 초기화
@@ -251,22 +251,34 @@ class Application(tk.Tk):
         with open(filepath, 'r') as file:
             data = json.load(file)
             # 데이터를 각 위젯에 적용
-            self.keywords_entry.insert(0, data['keywords'])
-            self.titles_entry.insert(0, data['titles'])
+            self.keywords_text.insert(0, data['keywords'])
+            self.titles_text.insert(0, data['titles'])
             # 나머지 위젯들도 같은 방식으로 적용
     
     def save_project(self):
         # 프로젝트를 저장하는 코드를 작성합니다.
         data = {
-            'keywords': self.keywords_entry.get(),
-            'titles': self.titles_entry.get(),
-            # 나머지 위젯들의 값을 가져와서 저장합니다.
+            'keywords': self.keywords_text.get(),
+            'titles': self.titles_text.get(),
+            'links': self.links_text.get(),
+            'refer_urls': self.refer_urls_text.get(),
+            'thread': self.thread_entry.get(),
+            'min_time': self.min_time_entry.get(),
+            'max_time': self.max_time_entry.get(),
+            'num_obj': self.num_obj_entry.get(),
+            'proxy_mode': self.proxy_mode.get(),
+            'proxy_type': self.proxy_type.get(),
+            'headless_check': self.headless_check.instate(['selected']),
+            'agent': self.agent_text.get(),
+            'proxies': self.proxies_text.get(),
+            'extensions_tree': [self.extensions_tree.set(child) for child in self.extensions_tree.get_children() if self.check_states[child] == 'checked']
         }
         filepath = filedialog.asksaveasfilename(defaultextension="json", filetypes=[("Json files", "*.json")])
         if not filepath:
             return
         with open(filepath, 'w') as file:
             json.dump(data, file)
+
 
     def save_as_project(self):
         # 프로젝트를 다른 이름으로 저장하는 코드를 작성합니다.
