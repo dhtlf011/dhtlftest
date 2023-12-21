@@ -13,70 +13,6 @@ import glob
 import json
 import os
 
-class Project:
-    def __init__(self, headless, proxy_type, proxy_mode, num_obj, thread, refer_url, links, title, keyword, proxy_list, user_agent_list, extension_path, script, use_time):
-        self.selenium_objects = []
-        self.stop_flag = False
-        self.headless = headless
-        self.proxy_type = proxy_type
-        self.proxy_mode = proxy_mode
-        self.num_obj = num_obj
-        self.thread = thread
-        self.refer_url = refer_url
-        self.links = links
-        self.title = title
-        self.keyword = keyword
-        self.proxy_list = proxy_list
-        self.user_agent_list = user_agent_list
-        self.extension_path = extension_path
-        self.script = script
-        self.use_time = use_time
-
-    def start_project(self, thread_entry):
-        threading.Thread(target=self.create_selenium_objects, args=(thread_entry,)).start()
-
-    def create_selenium_objects(self, thread_entry):
-        for _ in range(thread_entry):
-            if self.stop_flag:
-                return
-
-            options = Options()
-            options.add_argument("--headless")
-            options.add_extension(self.extension_path)
-            options.add_argument(f"user-agent={self.user_agent_list.pop()}")
-
-            proxy = Proxy()
-            proxy.proxy_type = ProxyType.MANUAL
-            proxy.http_proxy = self.proxy_list.pop()
-            proxy.ssl_proxy = self.proxy_list.pop()
-
-            capabilities = webdriver.DesiredCapabilities.CHROME
-            proxy.add_to_capabilities(capabilities)
-
-            driver = webdriver.Chrome(options=options, desired_capabilities=capabilities)
-            driver.execute_script(self.script)
-
-            self.selenium_objects.append(driver)
-
-            time.sleep(self.use_time)
-
-            self.stop_selenium_object(driver)
-
-    def stop_selenium_object(self, driver):
-        proxy = driver.capabilities['proxy']['httpProxy']
-        user_agent = driver.execute_script("return navigator.userAgent")
-
-        self.proxy_list.append(proxy)
-        self.user_agent_list.append(user_agent)
-
-        driver.quit()
-
-    def stop_project(self):
-        self.stop_flag = True
-        for driver in self.selenium_objects:
-            self.stop_selenium_object(driver)
-        exit()
-
 class PlaceholderEntry(ttk.Entry):
     def __init__(self, container, placeholder, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
@@ -264,31 +200,11 @@ class Application(tk.Tk):
 
         self.result_tree.place(x=0, y=0, width=646, height=247) 
 
-        proxy_list = self.proxies_text.get("1.0", "end").split('\n')  # 프록시 리스트를 정의합니다.
-        user_agent_list = self.agent_text.get("1.0", "end").split('\n')  # UserAgent 리스트를 정의합니다.
-        checked_items = [item for item in self.extensions_tree.get_children() if self.extensions_tree.item(item)['values'][0]]
-        extension_path = [self.extensions_tree.item(item)['values'][0] for item in checked_items]
-        checked_items = [item for item in self.script_tree.get_children() if self.script_tree.item(item)['values'][0]]
-        script = [self.script_tree.item(item)['values'][0] for item in checked_items]
-        min_time = int(self.min_time_entry.get())
-        max_time = int(self.max_time_entry.get())
-        use_time = random.randint(min_time, max_time)
-        keyword = self.keywords_text.get("1.0", "end").split('\n')
-        title = self.titles_text.get("1.0", "end").split('\n')
-        links = self.links_text.get("1.0", "end").split('\n')
-        refer_url = self.refer_urls_text.get("1.0", "end").split('\n')
-        thread = self.thread_entry.get()
-        num_obj = self.num_obj_entry.get()
-        proxy_mode = self.proxy_mode.get()
-        proxy_type = self.proxy_type.get()
-        headless = self.headless_var.get()
-        self.project = Project(headless,proxy_type,proxy_mode,num_obj,thread,refer_url,links,title,keyword,proxy_list, user_agent_list, extension_path, script, use_time)
-
     def start_project(self):
-        self.project.start_project()  # Project 클래스의 start_project 메서드를 호출합니다.
+        pass
 
     def stop_project(self):
-        self.project.stop_project()  # Project 클래스의 stop_project 메서드를 호출합니다.
+        pass
 
     def load_scripts(self):
         script_files = glob.glob(os.path.join('scripts', '*.py'))
